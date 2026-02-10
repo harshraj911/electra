@@ -17,7 +17,7 @@ if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
 # Define headers
-HEADERS = ['Timestamp', 'Game', 'Team Type', 'Team Name', 'Payment SS']
+HEADERS = ['Timestamp', 'Game', 'Team Type', 'Team Name', 'Unique ID', 'Payment SS']
 for i in range(1, 7):
     HEADERS.extend([f'Player{i} Name', f'Player{i} RegNo', f'Player{i} Year', f'Player{i} WhatsApp', f'Player{i} Gender'])
 
@@ -81,11 +81,22 @@ def register():
                     wb.close()
                     return jsonify({'error': f'Registration Number {row[idx-1]} is already registered for {game}.'}), 400
 
+    # Calculate Unique ID
+    unique_id = ""
+    if team_type == 'Single' and players:
+        p_name = players[0].get('name', '').split(' ')[0] # First name
+        p_reg = str(players[0].get('regNo', ''))
+        reg_suffix = p_reg[-4:] if len(p_reg) >= 4 else p_reg
+        unique_id = f"{p_name}_{reg_suffix}"
+    else:
+        unique_id = team_name or f"TEAM_{datetime.now().strftime('%M%S')}"
+
     row_data = [
         datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 
         game, 
         team_type, 
         team_name,
+        unique_id,
         ss_url
     ]
     
@@ -105,7 +116,7 @@ def register():
     ws.append(row_data)
     wb.save(DB_FILE)
     wb.close()
-    return jsonify({'message': 'Registration Successful!'}), 201
+    return jsonify({'message': 'Registration Successful!', 'unique_id': unique_id}), 201
 
 @app.route('/registrations', methods=['GET'])
 def get_registrations():
@@ -116,7 +127,7 @@ def get_registrations():
     for row in ws.iter_rows(min_row=2, values_only=True):
         players_list = []
         for i in range(6):
-            base_idx = 5+ (i * 5) # Updated base_idx because of ss_url column
+            base_idx = 6 + (i * 5) # Updated base_idx
             if row[base_idx]:
                 players_list.append({
                     'name': row[base_idx], 
@@ -130,7 +141,8 @@ def get_registrations():
             'game': row[1], 
             'teamType': row[2], 
             'teamName': row[3], 
-            'ss_url': row[4],
+            'unique_id': row[4],
+            'ss_url': row[5],
             'players': players_list
         })
     wb.close()

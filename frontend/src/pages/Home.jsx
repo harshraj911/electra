@@ -73,10 +73,10 @@ const Home = () => {
     }, [isSwiped]);
 
     return (
-        <div className="min-h-screen relative bg-[#020617] text-white overflow-hidden font-sans">
+        <div className="min-h-screen relative bg-[#020617] text-white font-sans selection:bg-cyan-500/30 selection:text-white">
 
             {/* ENHANCED CINEMATIC BACKGROUND */}
-            <div className="absolute inset-0 z-0 pointer-events-none">
+            <div className="fixed inset-0 z-0 pointer-events-none">
                 {/* Smooth Gradient Mesh */}
                 <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_20%_30%,rgba(6,182,212,0.15)_0%,transparent_50%),radial-gradient(circle_at_80%_70%,rgba(190,242,100,0.1)_0%,transparent_50%)]"></div>
 
@@ -97,8 +97,8 @@ const Home = () => {
                 ))}
 
                 {/* Subtle Moving Orbs */}
-                <div className="absolute top-[20%] left-[10%] w-[600px] h-[600px] bg-cyan-500/10 blur-[150px] animate-pulse"></div>
-                <div className="absolute bottom-[20%] right-[10%] w-[600px] h-[600px] bg-lime-500/10 blur-[150px] animate-pulse" style={{ animationDelay: '-3s' }}></div>
+                <div className="absolute top-[20%] left-[10%] w-[400px] md:w-[600px] h-[400px] md:h-[600px] bg-cyan-500/10 blur-[100px] md:blur-[150px] animate-pulse"></div>
+                <div className="absolute bottom-[20%] right-[10%] w-[400px] md:w-[600px] h-[400px] md:h-[600px] bg-lime-500/10 blur-[100px] md:blur-[150px] animate-pulse" style={{ animationDelay: '-3s' }}></div>
 
                 {/* Vertical Speed Lines */}
                 <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[length:100%_80px]"></div>
@@ -108,10 +108,10 @@ const Home = () => {
             <div className="relative z-10 min-h-screen flex flex-col justify-between p-6 md:p-12 max-w-[1600px] mx-auto">
 
                 {/* Header Section */}
-                <nav className="flex justify-between items-center animate-fade-in-up">
-                    <div className="flex items-center gap-6 group cursor-pointer" onClick={() => navigate('/')}>
+                <nav className="flex flex-col sm:flex-row justify-between items-center gap-8 py-4 sm:py-0 animate-fade-in-up">
+                    <div className="flex items-center gap-4 sm:gap-6 group cursor-pointer" onClick={() => navigate('/')}>
                         <div className="relative">
-                            <div className="w-20 h-20 glass-morphism rounded-3xl flex items-center justify-center border-white/20 group-hover:border-primary transition-all duration-700 overflow-hidden active:scale-95">
+                            <div className="w-16 h-16 sm:w-20 sm:h-20 glass-morphism rounded-3xl flex items-center justify-center border-white/20 group-hover:border-primary transition-all duration-700 overflow-hidden active:scale-95">
                                 {!logoError ? (
                                     <img
                                         src={logo}
@@ -120,23 +120,22 @@ const Home = () => {
                                         onError={() => setLogoError(true)}
                                     />
                                 ) : (
-                                    <span className="font-black italic text-5xl text-primary animate-glitch select-none">E</span>
+                                    <span className="font-black italic text-4xl sm:text-5xl text-primary animate-glitch select-none">E</span>
                                 )}
                             </div>
-                            {/* Pulse Ring */}
                             <div className="absolute -inset-2 bg-primary/20 rounded-3xl animate-pulse-ring -z-10"></div>
                         </div>
                         <div>
-                            <p className="text-[11px] font-black uppercase tracking-[0.7em] text-primary leading-none mb-1 animate-shimmer bg-clip-text">Student Arena</p>
-                            <h2 className="text-3xl font-black italic uppercase leading-none text-white tracking-tighter group-hover:text-primary transition-colors duration-500">ELECTRA</h2>
+                            <p className="text-[10px] sm:text-[11px] font-black uppercase tracking-[0.5em] sm:tracking-[0.7em] text-primary leading-none mb-1">Student Arena</p>
+                            <h2 className="text-2xl sm:text-3xl font-black italic uppercase leading-none text-white tracking-tighter group-hover:text-primary transition-colors duration-500">ELECTRA</h2>
                         </div>
                     </div>
 
                     <button
                         onClick={() => navigate('/admin/login')}
-                        className="group relative px-6 py-3 overflow-hidden rounded-full border border-white/10 hover:border-primary/50 transition-all duration-500"
+                        className="hidden lg:block group relative px-6 py-3 overflow-hidden rounded-full border border-white/10 hover:border-primary/50 transition-all duration-500"
                     >
-                        <span className="relative z-10 text-[11px] font-black uppercase tracking-[0.5em] text-white/40 group-hover:text-white transition-colors">Personnel Entrance</span>
+                        <span className="relative z-10 text-[10px] sm:text-[11px] font-black uppercase tracking-[0.3em] sm:tracking-[0.5em] text-white/40 group-hover:text-white transition-colors">Personnel Entrance</span>
                         <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     </button>
                 </nav>
@@ -244,20 +243,20 @@ const Home = () => {
                 </main>
 
                 {/* Footer Section */}
-                <footer className="flex flex-col md:flex-row justify-between items-end gap-10 animate-fade-in-up mt-20" style={{ animationDelay: '0.8s' }}>
-                    <div className="flex items-center gap-10 group cursor-default">
-                        <div className="text-right border-r-2 border-white/10 pr-10 group-hover:border-primary transition-colors duration-500">
+                <footer className="flex flex-col md:flex-row justify-between items-center md:items-end gap-10 animate-fade-in-up mt-20 text-center md:text-left" style={{ animationDelay: '0.8s' }}>
+                    <div className="flex flex-col sm:flex-row items-center gap-8 sm:gap-10 group cursor-default">
+                        <div className="md:text-right md:border-r-2 border-white/10 md:pr-10 group-hover:border-primary transition-colors duration-500">
                             <p className="font-heading text-3xl italic leading-none group-hover:text-primary transition-colors">FEB 20-21</p>
                             <p className="text-[10px] font-black uppercase tracking-[0.5em] text-white/30 group-hover:text-white transition-colors mt-2">Arena Entry</p>
                         </div>
-                        <div className="text-left">
+                        <div className="text-center sm:text-left">
                             <p className="font-heading text-3xl italic leading-none group-hover:text-secondary transition-colors">SMD ARENA</p>
                             <p className="text-[10px] font-black uppercase tracking-[0.5em] text-white/30 group-hover:text-white transition-colors mt-2">Shanti Devi Mittal Indoor Sports Complex</p>
                         </div>
                     </div>
 
-                    <div className="text-right space-y-4 max-w-md">
-                        <div className="flex gap-4 items-center justify-end">
+                    <div className="md:text-right space-y-4 max-w-md">
+                        <div className="flex gap-4 items-center justify-center md:justify-end">
                             <div className="h-1 w-20 bg-gradient-to-l from-primary to-transparent"></div>
                             <p className="text-[10px] font-black uppercase tracking-[0.5em] text-white/40 italic">Legacy Production</p>
                         </div>

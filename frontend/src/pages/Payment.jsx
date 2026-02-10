@@ -62,9 +62,15 @@ const Payment = () => {
         formData.append('screenshot', screenshot);
 
         try {
-            await register(formData);
-            alert('TRANSMISSION SUCCESSFUL: Your credentials and proof of payment have been synced to the database.');
-            navigate('/');
+            const res = await register(formData);
+            const { unique_id } = res.data;
+            navigate('/success', {
+                state: {
+                    uniqueId: unique_id,
+                    game: regData.game,
+                    teamType: regData.teamType
+                }
+            });
         } catch (err) {
             const errorMsg = err.response?.data?.error || "Connection failure with backend servers.";
             alert(`SUBMISSION FAILED: ${errorMsg}`);

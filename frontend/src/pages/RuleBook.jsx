@@ -102,27 +102,29 @@ const RuleBook = () => {
                     {/* Format Tables */}
                     <div className="space-y-12">
                         <h3 className="font-accent text-3xl italic tracking-tighter uppercase text-center mt-20">Match Format (Single Elimination)</h3>
-                        <div className="grid md:grid-cols-2 gap-10">
+                        <div className="grid lg:grid-cols-2 gap-10">
                             {/* Singles Table */}
                             <div className="glass-morphism rounded-[2rem] overflow-hidden">
                                 <div className="bg-primary/10 p-6 border-b border-primary/20">
                                     <h4 className="font-accent text-xl italic tracking-tighter uppercase">Singles (Solo) Table</h4>
                                 </div>
-                                <table className="w-full text-left text-[11px] font-black uppercase tracking-widest opacity-80">
-                                    <thead>
-                                        <tr className="bg-white/5">
-                                            <th className="px-6 py-4">Round</th>
-                                            <th className="px-6 py-4 text-center">Players</th>
-                                            <th className="px-6 py-4 text-right">Matches</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-white/5">
-                                        <tr><td className="px-6 py-4">Round 1</td><td className="px-6 py-4 text-center">20</td><td className="px-6 py-4 text-right">10</td></tr>
-                                        <tr><td className="px-6 py-4">Quarterfinals</td><td className="px-6 py-4 text-center">10</td><td className="px-6 py-4 text-right">5</td></tr>
-                                        <tr><td className="px-6 py-4">Semi-Finals</td><td className="px-6 py-4 text-center">5</td><td className="px-6 py-4 text-right">Byes</td></tr>
-                                        <tr><td className="px-6 py-4 text-primary">Final</td><td className="px-6 py-4 text-center">2</td><td className="px-6 py-4 text-right text-primary">1</td></tr>
-                                    </tbody>
-                                </table>
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-left text-[11px] font-black uppercase tracking-widest opacity-80 min-w-[400px]">
+                                        <thead>
+                                            <tr className="bg-white/5">
+                                                <th className="px-6 py-4">Round</th>
+                                                <th className="px-6 py-4 text-center">Players</th>
+                                                <th className="px-6 py-4 text-right">Matches</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-white/5">
+                                            <tr><td className="px-6 py-4">Round 1</td><td className="px-6 py-4 text-center">20</td><td className="px-6 py-4 text-right">10</td></tr>
+                                            <tr><td className="px-6 py-4">Quarterfinals</td><td className="px-6 py-4 text-center">10</td><td className="px-6 py-4 text-right">5</td></tr>
+                                            <tr><td className="px-6 py-4">Semi-Finals</td><td className="px-6 py-4 text-center">5</td><td className="px-6 py-4 text-right">Byes</td></tr>
+                                            <tr><td className="px-6 py-4 text-primary">Final</td><td className="px-6 py-4 text-center">2</td><td className="px-6 py-4 text-right text-primary">1</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
 
                             {/* Doubles Table */}
@@ -130,21 +132,23 @@ const RuleBook = () => {
                                 <div className="bg-primary/10 p-6 border-b border-primary/20">
                                     <h4 className="font-accent text-xl italic tracking-tighter uppercase">Doubles (Duo) Table</h4>
                                 </div>
-                                <table className="w-full text-left text-[11px] font-black uppercase tracking-widest opacity-80">
-                                    <thead>
-                                        <tr className="bg-white/5">
-                                            <th className="px-6 py-4">Round</th>
-                                            <th className="px-6 py-4 text-center">Teams</th>
-                                            <th className="px-6 py-4 text-right">Matches</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-white/5">
-                                        <tr><td className="px-6 py-4">Round 1</td><td className="px-6 py-4 text-center">20</td><td className="px-6 py-4 text-right">10</td></tr>
-                                        <tr><td className="px-6 py-4">Quarterfinals</td><td className="px-6 py-4 text-center">10</td><td className="px-6 py-4 text-right">5</td></tr>
-                                        <tr><td className="px-6 py-4">Semi-Finals</td><td className="px-6 py-4 text-center">5</td><td className="px-6 py-4 text-right">Byes</td></tr>
-                                        <tr><td className="px-6 py-4 text-primary">Final</td><td className="px-6 py-4 text-center">2</td><td className="px-6 py-4 text-right text-primary">1</td></tr>
-                                    </tbody>
-                                </table>
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-left text-[11px] font-black uppercase tracking-widest opacity-80 min-w-[400px]">
+                                        <thead>
+                                            <tr className="bg-white/5">
+                                                <th className="px-6 py-4">Round</th>
+                                                <th className="px-6 py-4 text-center">Teams</th>
+                                                <th className="px-6 py-4 text-right">Matches</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-white/5">
+                                            <tr><td className="px-6 py-4">Round 1</td><td className="px-6 py-4 text-center">20</td><td className="px-6 py-4 text-right">10</td></tr>
+                                            <tr><td className="px-6 py-4">Quarterfinals</td><td className="px-6 py-4 text-center">10</td><td className="px-6 py-4 text-right">5</td></tr>
+                                            <tr><td className="px-6 py-4">Semi-Finals</td><td className="px-6 py-4 text-center">5</td><td className="px-6 py-4 text-right">Byes</td></tr>
+                                            <tr><td className="px-6 py-4 text-primary">Final</td><td className="px-6 py-4 text-center">2</td><td className="px-6 py-4 text-right text-primary">1</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>

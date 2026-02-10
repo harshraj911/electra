@@ -5,6 +5,7 @@ import Register from './pages/Register';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
 import Payment from './pages/Payment';
+import Success from './pages/Success';
 import Guidelines from './pages/Guidelines';
 import RuleBook from './pages/RuleBook';
 import './index.css';
@@ -17,6 +18,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/register" element={<Register />} />
           <Route path="/payment" element={<Payment />} />
+          <Route path="/success" element={<Success />} />
           <Route path="/guidelines" element={<Guidelines />} />
           <Route path="/rulebook" element={<RuleBook />} />
           <Route path="/admin/login" element={<AdminLogin />} />
