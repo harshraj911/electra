@@ -1,59 +1,67 @@
-# Ground Clash - Event Registration System
+# Electra: College Arena League - Ground Clash Registration System
 
-A complete real-time event registration system for "Ground Clash" featuring Badminton and Volleyball.
+A cinematic, high-energy event registration platform for the "Ground Clash" sports event. Built with a premium SCI-FI aesthetic and real-time administrative control.
 
-## Tech Stack
-- **Frontend:** React.js, Tailwind CSS, Vite
-- **Backend:** Python Flask
-- **Database:** Excel (.xlsx) using openpyxl
-- **API:** REST (Axios)
+## 🚀 Key Features
 
-## Project Structure
-```
-/electra
-  /backend
-    app.py                # Flask Application
-    ground_clash_registrations.xlsx  # Database (Auto-generated)
-  /frontend
-    /src
-      /components
-      /pages
-        Home.jsx
-        Register.jsx
-        AdminLogin.jsx
-        AdminDashboard.jsx
-      api.js
-      App.jsx
-      main.jsx
-```
+### 🎮 Player Experience
+- **Cinematic Landing Page:** Modern sports-poster style UI with smooth animations.
+- **Dynamic Registration:** Intelligent form handling for **Badminton** (Solo/Duo) and **Volleyball** (Solo/Squad of 6).
+- **Official Protocol:** Dedicated pages for **Indoor Stadium Guidelines** and the **Official Rule Book**.
+- **Dynamic UPI Gateway:** Real-time generation of custom UPI QR codes with fixed amounts and transaction notes using `qrcode.react`.
+- **Proof Transmission:** Direct upload of payment screenshots to the backend server for manual verification.
 
-## Setup & Run Instructions
+### 🔐 Administrative Command Centre
+- **Secure Access:** Industrial-grade login terminal with masked codename inputs.
+- **Live Roster Intelligence:** Real-time view of all registrations with deep-filtering and search capabilities.
+- **Evidence Verification:** Instant full-screen modal view for payment proof verification.
+- **Gateway Configurator:** Edit Backend UPI ID and QR asset directly from the dashboard.
+- **Data Export:** Single-click export of entire registration database to Excel format.
+- **Database Reset:** Critical system reset ("NUKE") button with security safeguards.
 
-### 1. Backend (Flask)
-Open a terminal in the `backend` folder:
+## 🛠️ Tech Stack
+- **Frontend:** React 19, Tailwind CSS 4, Vite, Axios, React Router, qrcode.react.
+- **Backend:** Python Flask, openpyxl, Flask-CORS.
+- **Database:** Local Excel Ledger (`xlsx`).
+
+## ⚡ Setup & Execution
+
+### 1. Initialize Backend (Python)
+Navigate to the `backend` directory:
 ```bash
 cd backend
 pip install -r requirements.txt
 python app.py
 ```
-*The server will start at http://localhost:5000*
+*Port configuration: http://127.0.0.1:5001*
 
-### 2. Frontend (React)
-Open a new terminal in the `frontend` folder:
+### 2. Launch Interface (React)
+Navigate to the `frontend` directory:
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-*The application will open at http://localhost:5173*
+*Access via: http://localhost:5173*
 
-## Features
-- **Public:** Landing page with event details.
-- **Registration:** Dynamic form for Singles, Duos, and Teams (6).
-- **Validation:** Prevents duplicate registrations and validates inputs.
-- **Admin:** Login (admin/admin123) to view dashboard and download Excel data.
+## 📝 Admin Credentials
+- **Username:** `hraj48147`
+- **Password:** `985250`
 
-## API Endpoints
-- `POST /register`: Register a new team/player.
-- `GET /registrations`: Get all registrations (Admin).
-- `GET /download-excel`: Download the registrations Excel file.
+## 📁 System Architecture
+```text
+/electra
+  /backend
+    app.py                # Core API & Data Logic
+    uploads/              # Payment Proof & QR Assets
+    settings.json         # Dynamic Gateway Config
+  /frontend
+    /src
+      /pages              # Cinematic UI Layouts
+      /components         # Modular SCI-FI components
+      api.js              # Backend Tunnel Configuration
+      index.css           # Global Design System
+```
+
+---
+*Developed for Electra | Ground Clash 2026*
