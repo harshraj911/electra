@@ -108,7 +108,7 @@ const Register = () => {
                 <form onSubmit={handleSubmit} className="space-y-12">
 
                     {/* Section 01: Event Formation */}
-                    <div className={`glass-morphism p-8 md:p-10 rounded-[2.5rem] border-l-[8px] border-l-primary transition-all duration-700 shadow-2xl group/card relative overflow-hidden ${step >= 1 ? 'opacity-100 translate-x-0' : 'opacity-20 blur-sm -translate-x-10'}`}>
+                    <div className={`glass-morphism p-8 md:p-10 rounded-[2.5rem] border-l-[8px] border-l-primary transition-all duration-700 shadow-2xl group/card relative overflow-hidden ${step >= 1 ? 'opacity-100 translate-y-0' : 'opacity-20 blur-sm translate-y-10'}`}>
                         <div className="absolute inset-0 bg-gradient-to-br from-white/[0.03] to-transparent pointer-events-none"></div>
 
                         <div className="flex items-center gap-6 mb-10 relative z-10">

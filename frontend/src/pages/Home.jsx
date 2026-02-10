@@ -78,7 +78,7 @@ const Home = () => {
             {/* ENHANCED CINEMATIC BACKGROUND */}
             <div className="absolute inset-0 z-0 pointer-events-none">
                 {/* Smooth Gradient Mesh */}
-                <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_20%_30%,rgba(6,182,212,0.15)_0%,transparent_50%),radial-gradient(circle_at_80%_70%,rgba(190,242,100,0.1)_0%,transparent_50%)] animate-shimmer" style={{ backgroundSize: '200% 200%' }}></div>
+                <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_20%_30%,rgba(6,182,212,0.15)_0%,transparent_50%),radial-gradient(circle_at_80%_70%,rgba(190,242,100,0.1)_0%,transparent_50%)]"></div>
 
                 {/* Moving Particles */}
                 {particles.map((p) => (
@@ -137,7 +137,7 @@ const Home = () => {
                         className="group relative px-6 py-3 overflow-hidden rounded-full border border-white/10 hover:border-primary/50 transition-all duration-500"
                     >
                         <span className="relative z-10 text-[11px] font-black uppercase tracking-[0.5em] text-white/40 group-hover:text-white transition-colors">Personnel Entrance</span>
-                        <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-500 text-glow-cyan"></div>
+                        <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     </button>
                 </nav>
 
