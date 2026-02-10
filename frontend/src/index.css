@@ -147,7 +147,7 @@
 }
 
 @utility glass-morphism {
-  @apply backdrop-blur-2xl bg-white/[0.03] border border-white/10 shadow-[0_8px_32px_rgba(0, 0, 0, 0.5)];
+  @apply backdrop-blur-2xl bg-white/[0.03] border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)];
 }
 
 @utility text-glow-cyan {
@@ -159,7 +159,7 @@
 }
 
 @utility hover-card-3d {
-  @apply transition-all duration-500 hover:scale-[1.02] hover:-translate-y-2 hover:shadow-[0_20px_50px_rgba(6, 182, 212, 0.15)] active:scale-95;
+  @apply transition-all duration-500 hover:scale-[1.02] hover:-translate-y-2 hover:shadow-[0_20px_50px_rgba(6,182,212,0.15)] active:scale-95;
 }
 
 body {
