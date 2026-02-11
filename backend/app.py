@@ -192,43 +192,84 @@ def upload_qr():
             
         filename = secure_filename(f"qr_{datetime.now().timestamp()}.png")
         
-        # Attempt upload to Supabase
+        # 1. Verify Bucket First
         try:
-            # We use file.mimetype but default to image/png if not present
+            supabase.storage.get_bucket(SUPABASE_BUCKET)
+        except Exception as bucket_err:
+            print(f"Bucket Check Failed: {bucket_err}")
+            return jsonify({
+                'error': f"Bucket '{SUPABASE_BUCKET}' not detected on project.",
+                'details': str(bucket_err),
+                'hint': "Go to Supabase -> Storage -> Create a PUBLIC bucket named 'images'. Then run the SQL policies from 'backend/supabase_setup.sql'."
+            }), 404
+
+        # 2. Attempt upload to Supabase
+        try:
             content_type = file.mimetype or "image/png"
-            
             res = supabase.storage.from_(SUPABASE_BUCKET).upload(
                 filename, 
                 file_content, 
                 file_options={"content-type": content_type}
             )
             
-            # Check for error in response (some versions of supabase-py return error in response)
+            # 3. Robust Error Check (Library Version Agnostic)
+            error_data = None
             if hasattr(res, 'error') and res.error:
-                 raise Exception(f"Supabase Storage Error: {res.error}")
+                error_data = res.error
+            elif isinstance(res, dict) and 'error' in res:
+                error_data = res['error']
+            
+            if error_data:
+                raise Exception(f"Provider Error: {error_data}")
                  
             public_url = supabase.storage.from_(SUPABASE_BUCKET).get_public_url(filename)
             
-            # Update settings with new QR
+            # 4. Update settings with new QR
+            # Ensure settings exist
             existing = supabase.table('settings').select("id").limit(1).execute()
             if existing.data:
                 sid = existing.data[0]['id']
-                supabase.table('settings').update({'qr_image': public_url}).eq('id', sid).execute()
+                db_res = supabase.table('settings').update({'qr_image': public_url}).eq('id', sid).execute()
+                if not db_res.data:
+                    raise Exception("Database update returned empty. Check RLS policies on 'settings' table.")
             else:
-                supabase.table('settings').insert({'qr_image': public_url, 'upi_id': ''}).execute()
+                db_res = supabase.table('settings').insert({'qr_image': public_url, 'upi_id': ''}).execute()
+                if not db_res.data:
+                    raise Exception("Database insert failed. Check RLS policies on 'settings' table.")
 
-            return jsonify({'url': public_url, 'message': 'Storage upload successful'})
+            return jsonify({
+                'url': public_url, 
+                'message': 'System Updated Successfully',
+                'filename': filename
+            })
             
         except Exception as storage_err:
-            print(f"DEBUG: Supabase Storage Exception: {storage_err}")
+            print(f"DEBUG: Storage Level Exception: {storage_err}")
             return jsonify({
-                'error': f"Storage Upload Failed: {str(storage_err)}",
-                'hint': "Ensure the 'images' bucket exists in Supabase and is set to 'Public' with 'INSERT' policies for 'anon' role."
+                'error': "Storage Protocol Failure",
+                'details': str(storage_err),
+                'hint': "This usually means you missed the SQL policies. Run the 'CREATE POLICY' commands in your Supabase SQL Editor."
             }), 500
             
     except Exception as e:
-        print(f"QR Upload General Error: {e}")
-        return jsonify({'error': f"Internal Server Error: {str(e)}"}), 500
+        print(f"General Upload Failure: {e}")
+        return jsonify({'error': f"Terminal Error: {str(e)}"}), 500
+
+@app.route('/debug-storage', methods=['GET'])
+def debug_storage():
+    """Diagnostic route to check connection status"""
+    results = {}
+    try:
+        buckets = supabase.storage.list_buckets()
+        results['buckets'] = [b.name for b in buckets]
+        results['images_bucket_public'] = next((b.public for b in buckets if b.name == SUPABASE_BUCKET), "Not Found")
+        
+        settings = supabase.table('settings').select("*").execute()
+        results['settings_count'] = len(settings.data)
+        results['current_qr_in_db'] = settings.data[0].get('qr_image') if settings.data else "None"
+    except Exception as e:
+        results['error'] = str(e)
+    return jsonify(results)
 
 @app.route('/download-excel', methods=['GET'])
 def download_excel():

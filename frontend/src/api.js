@@ -30,5 +30,6 @@ export const clearData = () => api.post('/clear-data');
 export const getPaymentSettings = () => api.get('/payment-settings');
 export const updatePaymentSettings = (data) => api.post('/payment-settings', data);
 export const uploadQR = (formData) => api.post('/upload-qr', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+export const debugStorage = () => api.get('/debug-storage');
 
 export default api;
