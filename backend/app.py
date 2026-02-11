@@ -64,7 +64,7 @@ def register():
         if file.filename != '':
             filename = secure_filename(f"payment_{datetime.now().timestamp()}.png")
             file.save(os.path.join(UPLOAD_FOLDER, filename))
-            ss_url = f"http://127.0.0.1:5001/uploads/{filename}"
+            ss_url = f"{request.host_url}uploads/{filename}"
 
     wb = load_workbook(DB_FILE)
     ws = wb.active
@@ -192,4 +192,4 @@ def download_excel():
     return send_file(DB_FILE, as_attachment=True)
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5001)
+    app.run(debug=True, host='0.0.0.0', port=5001)
