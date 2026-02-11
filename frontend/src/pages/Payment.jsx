@@ -14,6 +14,7 @@ const Payment = () => {
 
     const [upiId, setUpiId] = useState('9631627055@ptaxis'); // Default fallback
     const [payeeName, setPayeeName] = useState('Harsh Raj');
+    const [qrImage, setQrImage] = useState('');
 
     useEffect(() => {
         if (!location.state?.regData) {
@@ -24,7 +25,7 @@ const Payment = () => {
 
         getPaymentSettings().then(res => {
             if (res.data.upi_id) setUpiId(res.data.upi_id);
-            // We could add payee_name to settings too, but sticking to requested inputs
+            if (res.data.qr_image) setQrImage(res.data.qr_image);
         }).catch(err => console.error("Gateway Offline", err));
     }, [location, navigate]);
 
@@ -114,6 +115,7 @@ const Payment = () => {
                         teamType={regData.teamType}
                         upiId={upiId}
                         payeeName={payeeName}
+                        qrImage={qrImage}
                     />
 
                     {/* Right Panel: Proof Upload */}

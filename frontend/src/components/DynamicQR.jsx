@@ -1,7 +1,7 @@
 import { QRCodeCanvas } from 'qrcode.react';
 import { useRef } from 'react';
 
-const DynamicQR = ({ game, teamType, upiId = "9631627055@ptaxis", payeeName = "Harsh Raj" }) => {
+const DynamicQR = ({ game, teamType, upiId = "7888778370@ybl", payeeName = "Harsh Raj" }) => {
     const qrRef = useRef();
 
     // Fee logic based on user's new requirements
@@ -19,7 +19,7 @@ const DynamicQR = ({ game, teamType, upiId = "9631627055@ptaxis", payeeName = "H
     const note = `Ground Clash - ${game} ${teamType}`;
 
     // UPI payment link format: upi://pay?pa=UPI_ID&pn=PAYEE_NAME&am=AMOUNT&cu=INR&tn=NOTE
-    const upiLink = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(payeeName)}&am=${amount}&cu=INR&tn=${encodeURIComponent(note)}`;
+    const upiLink = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(payeeName)}&am=${amount}.00&cu=INR&tn=${encodeURIComponent(note)}&mode=02&purpose=00`;
 
     const downloadQR = () => {
         const canvas = qrRef.current.querySelector('canvas');
@@ -27,7 +27,7 @@ const DynamicQR = ({ game, teamType, upiId = "9631627055@ptaxis", payeeName = "H
             const url = canvas.toDataURL("image/png");
             const link = document.createElement('a');
             link.href = url;
-            link.download = `Payment_QR_${game}_${teamType}.png`;
+            link.download = `Electra_QR_${game}_${teamType}.png`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -36,31 +36,31 @@ const DynamicQR = ({ game, teamType, upiId = "9631627055@ptaxis", payeeName = "H
 
     return (
         <div className="flex flex-col items-center gap-4 sm:gap-6 p-6 sm:p-8 glass-morphism rounded-[2rem] sm:rounded-[2.5rem] border border-white/10 animate-fade-in-up">
-            <div className="relative group p-3 sm:p-4 bg-white rounded-2xl sm:rounded-3xl shadow-2xl" id="qr-container" ref={qrRef}>
-                <QRCodeCanvas
-                    value={upiLink}
-                    size={window.innerWidth < 640 ? 180 : 220}
-                    level="H"
-                    includeMargin={true}
-                    imageSettings={{
-                        src: "/logo.png",
-                        x: undefined,
-                        y: undefined,
-                        height: window.innerWidth < 640 ? 30 : 40,
-                        width: window.innerWidth < 640 ? 30 : 40,
-                        excavate: true,
-                    }}
-                />
+            <div className="relative group p-3 sm:p-4 bg-white rounded-2xl sm:rounded-3xl shadow-2xl hover:scale-105 transition-all duration-500" id="qr-container" ref={qrRef}>
+                <a href={upiLink} className="block relative">
+                    <QRCodeCanvas
+                        value={upiLink}
+                        size={window.innerWidth < 640 ? 200 : 250}
+                        level="H"
+                        includeMargin={true}
+                        imageSettings={{
+                            src: "/logo.png",
+                            x: undefined,
+                            y: undefined,
+                            height: window.innerWidth < 640 ? 45 : 60,
+                            width: window.innerWidth < 640 ? 45 : 60,
+                            excavate: true,
+                        }}
+                    />
 
-                {/* Scanner animation overlay */}
-                <div className="absolute inset-3 sm:inset-4 pointer-events-none overflow-hidden rounded-xl">
-                    <div className="w-full h-1 bg-primary/40 animate-scanner absolute top-0 left-0"></div>
-                </div>
+                    {/* Scanner animation overlay */}
+                    <div className="absolute inset-x-0 h-1 bg-primary/60 animate-scanner top-0 left-0 shadow-[0_0_15px_rgba(6,182,212,0.8)] pointer-events-none"></div>
+                </a>
             </div>
 
-            <div className="text-center space-y-2 sm:space-y-3">
+            <div className="text-center space-y-2 sm:space-y-3 w-full">
                 <div className="px-4 py-1 sm:px-6 sm:py-2 bg-primary/10 rounded-full inline-block border border-primary/20">
-                    <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] sm:tracking-[0.3em] text-primary italic">Payable Amount</span>
+                    <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] sm:tracking-[0.3em] text-primary italic">Payable Arena Pass</span>
                 </div>
 
                 <h4 className="font-accent text-4xl sm:text-5xl italic text-white text-glow-cyan leading-none">₹{amount}</h4>
@@ -71,20 +71,28 @@ const DynamicQR = ({ game, teamType, upiId = "9631627055@ptaxis", payeeName = "H
                 </div>
 
                 <div className="bg-white/5 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-white/5 mt-3 sm:mt-4">
-                    <p className="text-[7px] sm:text-[8px] font-black uppercase text-white/20 tracking-widest mb-1">Transaction Note</p>
+                    <p className="text-[7px] sm:text-[8px] font-black uppercase text-white/20 tracking-widest mb-1">Transaction Protocol</p>
                     <p className="text-[10px] sm:text-[11px] font-bold text-white/80 italic">{note}</p>
                 </div>
             </div>
 
-            <button
-                onClick={downloadQR}
-                className="w-full py-4 glass-morphism border-primary/30 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] sm:tracking-[0.3em] text-primary hover:bg-primary hover:text-black transition-all rounded-xl sm:rounded-2xl active:scale-95 flex items-center justify-center gap-2 sm:gap-3"
-            >
-                <span className="text-base sm:text-lg">💾</span> DOWNLOAD QR
-            </button>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full mt-2">
+                <a
+                    href={upiLink}
+                    className="flex-1 py-4 bg-primary text-black text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] rounded-xl sm:rounded-2xl flex items-center justify-center gap-2 hover:bg-white transition-all active:scale-95 shadow-[0_4px_15px_rgba(6,182,212,0.4)]"
+                >
+                    <span className="text-base">⚡</span> INSTANT PAY
+                </a>
+                <button
+                    onClick={downloadQR}
+                    className="flex-1 py-4 glass-morphism border-primary/30 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-primary hover:bg-primary/10 transition-all rounded-xl sm:rounded-2xl active:scale-95 flex items-center justify-center gap-2"
+                >
+                    <span className="text-base">💾</span> DOWNLOAD PASS
+                </button>
+            </div>
 
-            <p className="text-[7px] sm:text-[8px] font-bold uppercase text-white/20 tracking-[0.05em] sm:tracking-[0.1em] italic mt-1 sm:mt-2">
-                Scan using any UPI App (GPay, PhonePe, Paytm)
+            <p className="text-[7px] sm:text-[8px] font-bold uppercase text-white/20 tracking-[0.05em] sm:tracking-[0.1em] italic text-center">
+                Branded Dynamic QR with Electra Security Protocol
             </p>
         </div>
     );

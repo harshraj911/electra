@@ -8,12 +8,14 @@ import Payment from './pages/Payment';
 import Success from './pages/Success';
 import Guidelines from './pages/Guidelines';
 import RuleBook from './pages/RuleBook';
+import SupportButton from './components/SupportButton';
 import './index.css';
 
 function App() {
   return (
     <Router>
       <div className="App">
+        <SupportButton />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/register" element={<Register />} />
