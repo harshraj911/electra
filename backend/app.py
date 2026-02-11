@@ -1,38 +1,32 @@
 from flask import Flask, request, jsonify, send_file, send_from_directory
 from flask_cors import CORS
-from openpyxl import Workbook, load_workbook
+from openpyxl import Workbook
 import os
 import json
 from datetime import datetime
 from werkzeug.utils import secure_filename
+from supabase import create_client, Client
 
 app = Flask(__name__)
 CORS(app)
 
-# Use DATA_DIR from env if available, otherwise current directory (for local dev)
+# Supabase Configuration
+SUPABASE_URL = "https://zxxzkvtkdhnwvmwgfbjc.supabase.co"
+SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4eHprdnRrZGhud3Ztd2dmYmpjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4MDY5ODYsImV4cCI6MjA4NjM4Mjk4Nn0.L5z607BYgehqbprbBJk1zyQ5rmVPm_KFUvEWczJKfe4"
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+# Local Fallbacks for temp file handling (files will still be ephemeral on Render Free without Supabase Storage)
+# To fully fix file persistence, we would need Supabase Storage bucket setup.
+# For now, we persist DATA in database, but files are local.
 DATA_DIR = os.environ.get('DATA_DIR', '.')
 if not os.path.exists(DATA_DIR):
     os.makedirs(DATA_DIR)
 
-DB_FILE = os.path.join(DATA_DIR, 'ground_clash_registrations.xlsx')
 SETTINGS_FILE = os.path.join(DATA_DIR, 'settings.json')
 UPLOAD_FOLDER = os.path.join(DATA_DIR, 'uploads')
 
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
-
-# Define headers
-HEADERS = ['Timestamp', 'Game', 'Team Type', 'Team Name', 'Unique ID', 'Payment SS']
-for i in range(1, 9):
-    HEADERS.extend([f'Player{i} Name', f'Player{i} RegNo', f'Player{i} Year', f'Player{i} WhatsApp', f'Player{i} Gender'])
-
-def init_db():
-    if not os.path.exists(DB_FILE):
-        wb = Workbook()
-        ws = wb.active
-        ws.title = "Registrations"
-        ws.append(HEADERS)
-        wb.save(DB_FILE)
 
 def init_settings():
     if not os.path.exists(SETTINGS_FILE):
@@ -43,7 +37,6 @@ def init_settings():
         with open(SETTINGS_FILE, 'w') as f:
             json.dump(default_settings, f)
 
-init_db()
 init_settings()
 
 @app.route('/uploads/<filename>')
@@ -71,28 +64,6 @@ def register():
             file.save(os.path.join(UPLOAD_FOLDER, filename))
             ss_url = f"{request.host_url}uploads/{filename}"
 
-    wb = load_workbook(DB_FILE)
-    ws = wb.active
-    
-    # Duplicate check
-    new_reg_nos = [p.get('regNo') for p in players if p.get('regNo')]
-    # Update duplicate check for 8 players
-    reg_no_indices = [HEADERS.index(f'Player{i} RegNo') + 1 for i in range(1, 9) if f'Player{i} RegNo' in HEADERS]
-    # Fallback if headers in file don't match (for older files)
-    if not reg_no_indices:
-         reg_no_indices = [6 + ((i-1)*5) + 2 for i in range(1, 9)]
-
-    game_col_idx = 2 # Game is 2nd column
-    
-    for row in ws.iter_rows(min_row=2, values_only=True):
-        if row[game_col_idx - 1] == game:
-            for idx in reg_no_indices:
-                # bounds check
-                if idx - 1 < len(row):
-                    if row[idx - 1] and str(row[idx - 1]) in map(str, new_reg_nos):
-                        wb.close()
-                        return jsonify({'error': f'Registration Number {row[idx-1]} is already registered for {game}.'}), 400
-
     # Calculate Unique ID
     unique_id = ""
     if team_type == 'Single' and players:
@@ -103,74 +74,81 @@ def register():
     else:
         unique_id = team_name or f"TEAM_{datetime.now().strftime('%M%S')}"
 
-    row_data = [
-        datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 
-        game, 
-        team_type, 
-        team_name,
-        unique_id,
-        ss_url
-    ]
-    
-    for i in range(8):
-        if i < len(players):
-            p = players[i]
-            row_data.extend([
-                p.get('name', ''), 
-                p.get('regNo', ''), 
-                p.get('year', ''), 
-                p.get('whatsapp', ''), 
-                p.get('gender', '')
-            ])
-        else:
-            row_data.extend(['', '', '', '', ''])
-            
-    ws.append(row_data)
-    wb.save(DB_FILE)
-    wb.close()
-    return jsonify({'message': 'Registration Successful!', 'unique_id': unique_id}), 201
+    # Prepare Payload for Supabase
+    db_payload = {
+        "game": game,
+        "team_type": team_type,
+        "team_name": team_name,
+        "unique_id": unique_id,
+        "screenshot_url": ss_url,
+        "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    }
+
+    # Add players (up to 8)
+    for i, p in enumerate(players):
+        if i < 8:
+            idx = i + 1
+            db_payload[f"player{idx}_name"] = p.get('name', '')
+            db_payload[f"player{idx}_reg"] = p.get('regNo', '')
+            db_payload[f"player{idx}_year"] = p.get('year', '')
+            db_payload[f"player{idx}_whatsapp"] = p.get('whatsapp', '')
+            db_payload[f"player{idx}_gender"] = p.get('gender', '')
+
+    try:
+        data, count = supabase.table('registrations').insert(db_payload).execute()
+        return jsonify({'message': 'Registration Successful!', 'unique_id': unique_id}), 201
+    except Exception as e:
+        print(e)
+        return jsonify({'error': 'Database Error', 'details': str(e)}), 400
 
 @app.route('/registrations', methods=['GET'])
 def get_registrations():
-    if not os.path.exists(DB_FILE): return jsonify([])
-    wb = load_workbook(DB_FILE)
-    ws = wb.active
-    registrations = []
-    for row in ws.iter_rows(min_row=2, values_only=True):
-        players_list = []
-        for i in range(8):
-            base_idx = 6 + (i * 5)
-            if base_idx < len(row) and row[base_idx]:
-                players_list.append({
-                    'name': row[base_idx], 
-                    'regNo': row[base_idx+1], 
-                    'year': row[base_idx+2], 
-                    'whatsapp': row[base_idx+3], 
-                    'gender': row[base_idx+4]
-                })
-        registrations.append({
-            'timestamp': row[0], 
-            'game': row[1], 
-            'teamType': row[2], 
-            'teamName': row[3], 
-            'unique_id': row[4],
-            'ss_url': row[5],
-            'players': players_list
-        })
-    wb.close()
-    return jsonify(registrations)
+    try:
+        response = supabase.table('registrations').select("*").order('created_at', desc=True).execute()
+        rows = response.data
+        
+        # Transform back to frontend format
+        registrations = []
+        for row in rows:
+            players_list = []
+            for i in range(1, 9):
+                if row.get(f'player{i}_name'):
+                    players_list.append({
+                        'name': row.get(f'player{i}_name'),
+                        'regNo': row.get(f'player{i}_reg'),
+                        'year': row.get(f'player{i}_year'),
+                        'whatsapp': row.get(f'player{i}_whatsapp'),
+                        'gender': row.get(f'player{i}_gender')
+                    })
+            
+            registrations.append({
+                'timestamp': row.get('created_at'),
+                'game': row.get('game'),
+                'teamType': row.get('team_type'),
+                'teamName': row.get('team_name'),
+                'unique_id': row.get('unique_id'),
+                'ss_url': row.get('screenshot_url'),
+                'players': players_list
+            })
+        return jsonify(registrations)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/clear-data', methods=['POST'])
 def clear_data():
-    if os.path.exists(DB_FILE):
-        os.remove(DB_FILE)
-    init_db()
-    return jsonify({'message': 'All data cleared successfully'})
+    try:
+        # Delete all rows
+        supabase.table('registrations').delete().neq('id', '00000000-0000-0000-0000-000000000000').execute()
+        return jsonify({'message': 'All data cleared successfully'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/payment-settings', methods=['GET'])
 def get_settings():
-    with open(SETTINGS_FILE, 'r') as f:
-        return jsonify(json.load(f))
+    if os.path.exists(SETTINGS_FILE):
+        with open(SETTINGS_FILE, 'r') as f:
+            return jsonify(json.load(f))
+    return jsonify({})
 
 @app.route('/payment-settings', methods=['POST'])
 def update_settings():
@@ -200,8 +178,43 @@ def upload_qr():
 
 @app.route('/download-excel', methods=['GET'])
 def download_excel():
-    if not os.path.exists(DB_FILE): return jsonify({'error': 'File not found'}), 404
-    return send_file(DB_FILE, as_attachment=True)
+    # Fetch from Supabase and generate Excel on the fly
+    try:
+        response = supabase.table('registrations').select("*").order('created_at', desc=True).execute()
+        rows = response.data
+        
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "Registrations"
+        
+        HEADERS = ['Timestamp', 'Game', 'Team Type', 'Team Name', 'Unique ID', 'Payment SS']
+        for i in range(1, 9):
+            HEADERS.extend([f'Player{i} Name', f'Player{i} RegNo', f'Player{i} Year', f'Player{i} WhatsApp', f'Player{i} Gender'])
+        ws.append(HEADERS)
+        
+        for row in rows:
+            row_data = [
+                row.get('created_at'),
+                row.get('game'),
+                row.get('team_type'),
+                row.get('team_name'),
+                row.get('unique_id'),
+                row.get('screenshot_url')
+            ]
+            for i in range(1, 9):
+                row_data.extend([
+                    row.get(f'player{i}_name', ''),
+                    row.get(f'player{i}_reg', ''),
+                    row.get(f'player{i}_year', ''),
+                    row.get(f'player{i}_whatsapp', ''),
+                    row.get(f'player{i}_gender', '')
+                ])
+            ws.append(row_data)
+        
+        wb.save("temp_export.xlsx")
+        return send_file("temp_export.xlsx", as_attachment=True, download_name="ground_clash_registrations.xlsx")
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5001)
