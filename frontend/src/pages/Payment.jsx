@@ -10,11 +10,10 @@ const Payment = () => {
     const [logoError, setLogoError] = useState(false);
     const [screenshot, setScreenshot] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [upiId, setUpiId] = useState('anshulbhuria2006-1@oksbi'); // Default fallback
     const [isRevealed, setIsRevealed] = useState(false);
 
-    const [upiId, setUpiId] = useState('anshulbhuria2006-1@oksbi'); // Default fallback
     const [payeeName, setPayeeName] = useState('Anshul Bhuria');
-    const [qrImage, setQrImage] = useState('');
 
     useEffect(() => {
         if (!location.state?.regData) {
@@ -25,7 +24,6 @@ const Payment = () => {
 
         getPaymentSettings().then(res => {
             if (res.data.upi_id) setUpiId(res.data.upi_id);
-            if (res.data.qr_image) setQrImage(res.data.qr_image);
         }).catch(err => console.error("Gateway Offline", err));
     }, [location, navigate]);
 
