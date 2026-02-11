@@ -30,11 +30,20 @@ const AdminDashboard = () => {
         try {
             const res = await getRegistrations();
             setRegistrations(res.data);
+        } catch (err) {
+            console.error("Failed to fetch registrations:", err);
+            // Optional: alert/notify user
+        }
 
+        try {
             const settings = await getPaymentSettings();
-            setUpiId(settings.data.upi_id);
-            setQrPreview(settings.data.qr_image);
-        } catch (err) { console.error(err); }
+            if (settings.data) {
+                setUpiId(settings.data.upi_id || '');
+                setQrPreview(settings.data.qr_image || '');
+            }
+        } catch (err) {
+            console.error("Failed to fetch payment settings:", err);
+        }
     };
 
     useEffect(() => {
