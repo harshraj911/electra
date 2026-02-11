@@ -115,7 +115,6 @@ const Payment = () => {
                         teamType={regData.teamType}
                         upiId={upiId}
                         payeeName={payeeName}
-                        qrImage={qrImage}
                         amount={price}
                     />
 
