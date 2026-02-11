@@ -1,8 +1,9 @@
-from flask import Flask, request, jsonify, send_file, send_from_directory
+from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 from openpyxl import Workbook
 import os
 import json
+import io
 from datetime import datetime
 from werkzeug.utils import secure_filename
 from supabase import create_client, Client
@@ -14,34 +15,7 @@ CORS(app)
 SUPABASE_URL = "https://zxxzkvtkdhnwvmwgfbjc.supabase.co"
 SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp4eHprdnRrZGhud3Ztd2dmYmpjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4MDY5ODYsImV4cCI6MjA4NjM4Mjk4Nn0.L5z607BYgehqbprbBJk1zyQ5rmVPm_KFUvEWczJKfe4"
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
-
-# Local Fallbacks for temp file handling (files will still be ephemeral on Render Free without Supabase Storage)
-# To fully fix file persistence, we would need Supabase Storage bucket setup.
-# For now, we persist DATA in database, but files are local.
-DATA_DIR = os.environ.get('DATA_DIR', '.')
-if not os.path.exists(DATA_DIR):
-    os.makedirs(DATA_DIR)
-
-SETTINGS_FILE = os.path.join(DATA_DIR, 'settings.json')
-UPLOAD_FOLDER = os.path.join(DATA_DIR, 'uploads')
-
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
-
-def init_settings():
-    if not os.path.exists(SETTINGS_FILE):
-        default_settings = {
-            "upi_id": "example@upi",
-            "qr_image": ""
-        }
-        with open(SETTINGS_FILE, 'w') as f:
-            json.dump(default_settings, f)
-
-init_settings()
-
-@app.route('/uploads/<filename>')
-def uploaded_file(filename):
-    return send_from_directory(UPLOAD_FOLDER, filename)
+SUPABASE_BUCKET = 'images'
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -49,57 +23,62 @@ def register():
     if 'regData' not in request.form:
         return jsonify({'error': 'Missing registration data'}), 400
     
-    data = json.loads(request.form['regData'])
-    game = data.get('game')
-    team_type = data.get('teamType')
-    team_name = data.get('teamName', '')
-    players = data.get('players', [])
-    
-    # Handle Screenshot
-    ss_url = ""
-    if 'screenshot' in request.files:
-        file = request.files['screenshot']
-        if file.filename != '':
-            filename = secure_filename(f"payment_{datetime.now().timestamp()}.png")
-            file.save(os.path.join(UPLOAD_FOLDER, filename))
-            ss_url = f"{request.host_url}uploads/{filename}"
-
-    # Calculate Unique ID
-    unique_id = ""
-    if team_type == 'Single' and players:
-        p_name = players[0].get('name', '').split(' ')[0] # First name
-        p_reg = str(players[0].get('regNo', ''))
-        reg_suffix = p_reg[-4:] if len(p_reg) >= 4 else p_reg
-        unique_id = f"{p_name}_{reg_suffix}"
-    else:
-        unique_id = team_name or f"TEAM_{datetime.now().strftime('%M%S')}"
-
-    # Prepare Payload for Supabase
-    db_payload = {
-        "game": game,
-        "team_type": team_type,
-        "team_name": team_name,
-        "unique_id": unique_id,
-        "screenshot_url": ss_url,
-        "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    }
-
-    # Add players (up to 8)
-    for i, p in enumerate(players):
-        if i < 8:
-            idx = i + 1
-            db_payload[f"player{idx}_name"] = p.get('name', '')
-            db_payload[f"player{idx}_reg"] = p.get('regNo', '')
-            db_payload[f"player{idx}_year"] = p.get('year', '')
-            db_payload[f"player{idx}_whatsapp"] = p.get('whatsapp', '')
-            db_payload[f"player{idx}_gender"] = p.get('gender', '')
-
     try:
+        data = json.loads(request.form['regData'])
+        game = data.get('game')
+        team_type = data.get('teamType')
+        team_name = data.get('teamName', '')
+        players = data.get('players', [])
+        
+        # Handle Screenshot Upload to Supabase Storage
+        ss_url = ""
+        if 'screenshot' in request.files:
+            file = request.files['screenshot']
+            if file.filename != '':
+                filename = secure_filename(f"payment_{datetime.now().timestamp()}.png")
+                try:
+                    res = supabase.storage.from_(SUPABASE_BUCKET).upload(filename, file.read(), file_options={"content-type": file.mimetype})
+                    ss_url = supabase.storage.from_(SUPABASE_BUCKET).get_public_url(filename)
+                except Exception as e:
+                    print(f"Storage Upload Error: {e}")
+                    # Fallback or allow continue without screenshot? Allow.
+
+        # Calculate Unique ID
+        unique_id = ""
+        if team_type == 'Single' and players:
+            p_name = players[0].get('name', '').split(' ')[0] # First name
+            p_reg = str(players[0].get('regNo', ''))
+            reg_suffix = p_reg[-4:] if len(p_reg) >= 4 else p_reg
+            unique_id = f"{p_name}_{reg_suffix}"
+        else:
+            unique_id = team_name or f"TEAM_{datetime.now().strftime('%M%S')}"
+
+        # Prepare Payload for Supabase
+        db_payload = {
+            "game": game,
+            "team_type": team_type,
+            "team_name": team_name,
+            "unique_id": unique_id,
+            "screenshot_url": ss_url,
+            "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
+
+        # Add players (up to 8)
+        for i, p in enumerate(players):
+            if i < 8:
+                idx = i + 1
+                db_payload[f"player{idx}_name"] = p.get('name', '')
+                db_payload[f"player{idx}_reg"] = p.get('regNo', '')
+                db_payload[f"player{idx}_year"] = p.get('year', '')
+                db_payload[f"player{idx}_whatsapp"] = p.get('whatsapp', '')
+                db_payload[f"player{idx}_gender"] = p.get('gender', '')
+
         data, count = supabase.table('registrations').insert(db_payload).execute()
         return jsonify({'message': 'Registration Successful!', 'unique_id': unique_id}), 201
+
     except Exception as e:
-        print(e)
-        return jsonify({'error': 'Database Error', 'details': str(e)}), 400
+        print(f"Registration Error: {e}")
+        return jsonify({'error': 'Registration Failed', 'details': str(e)}), 400
 
 @app.route('/registrations', methods=['GET'])
 def get_registrations():
@@ -145,17 +124,40 @@ def clear_data():
 
 @app.route('/payment-settings', methods=['GET'])
 def get_settings():
-    if os.path.exists(SETTINGS_FILE):
-        with open(SETTINGS_FILE, 'r') as f:
-            return jsonify(json.load(f))
-    return jsonify({})
+    try:
+        # Fetch from 'settings' table
+        response = supabase.table('settings').select("*").limit(1).execute()
+        if response.data:
+            return jsonify(response.data[0])
+        else:
+            # If empty, create default
+            default_settings = {"upi_id": "", "qr_image": ""}
+            try:
+                supabase.table('settings').insert(default_settings).execute()
+            except:
+                pass # Might fail if table doesn't exist
+            return jsonify(default_settings)
+    except Exception as e:
+        print(f"Error fetching settings: {e}")
+        return jsonify({})
 
 @app.route('/payment-settings', methods=['POST'])
 def update_settings():
-    data = request.json
-    with open(SETTINGS_FILE, 'w') as f:
-        json.dump(data, f)
-    return jsonify({'message': 'Settings updated'})
+    try:
+        data = request.json
+        # Check if settings exist
+        existing = supabase.table('settings').select("id").limit(1).execute()
+        
+        if existing.data:
+            sid = existing.data[0]['id']
+            supabase.table('settings').update(data).eq('id', sid).execute()
+        else:
+            supabase.table('settings').insert(data).execute()
+            
+        return jsonify({'message': 'Settings updated'})
+    except Exception as e:
+        print(f"Error updating settings: {e}")
+        return jsonify({'error': 'Update failed'}), 500
 
 @app.route('/upload-qr', methods=['POST'])
 def upload_qr():
@@ -165,16 +167,23 @@ def upload_qr():
     if file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
     
-    filename = secure_filename(f"qr_{datetime.now().timestamp()}.png")
-    file.save(os.path.join(UPLOAD_FOLDER, filename))
-    
-    with open(SETTINGS_FILE, 'r') as f:
-        settings = json.load(f)
-    settings['qr_image'] = f"{request.host_url}uploads/{filename}"
-    with open(SETTINGS_FILE, 'w') as f:
-        json.dump(settings, f)
+    try:
+        filename = secure_filename(f"qr_{datetime.now().timestamp()}.png")
+        res = supabase.storage.from_(SUPABASE_BUCKET).upload(filename, file.read(), file_options={"content-type": file.mimetype})
+        public_url = supabase.storage.from_(SUPABASE_BUCKET).get_public_url(filename)
         
-    return jsonify({'url': settings['qr_image']})
+        # Update settings with new QR
+        existing = supabase.table('settings').select("id").limit(1).execute()
+        if existing.data:
+            sid = existing.data[0]['id']
+            supabase.table('settings').update({'qr_image': public_url}).eq('id', sid).execute()
+        else:
+            supabase.table('settings').insert({'qr_image': public_url, 'upi_id': ''}).execute()
+
+        return jsonify({'url': public_url})
+    except Exception as e:
+        print(f"QR Upload Error: {e}")
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/download-excel', methods=['GET'])
 def download_excel():
@@ -211,8 +220,12 @@ def download_excel():
                 ])
             ws.append(row_data)
         
-        wb.save("temp_export.xlsx")
-        return send_file("temp_export.xlsx", as_attachment=True, download_name="ground_clash_registrations.xlsx")
+        # Save to memory buffer
+        buffer = io.BytesIO()
+        wb.save(buffer)
+        buffer.seek(0)
+        
+        return send_file(buffer, as_attachment=True, download_name="ground_clash_registrations.xlsx", mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
