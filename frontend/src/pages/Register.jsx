@@ -30,7 +30,7 @@ const Register = () => {
         let count = 0;
         if (type === 'Single') count = 1;
         else if (formData.game === 'Badminton' && type === 'Duo') count = 2;
-        else if (formData.game === 'Volleyball' && type === 'Team of 6') count = 6;
+        else if (formData.game === 'Volleyball' && type === 'Team of 6') count = 8;
 
         const players = Array.from({ length: count }, () => ({ name: '', regNo: '', year: '', whatsapp: '', gender: '' }));
         setFormData({ ...formData, teamType: type, players });
@@ -139,7 +139,7 @@ const Register = () => {
                                             <option value="" className="bg-[#020617] text-white">SELECT TYPE</option>
                                             <option value="Single" className="bg-[#020617] text-white">SOLO (Agent)</option>
                                             {formData.game === 'Badminton' && <option value="Duo" className="bg-[#020617] text-white">DUO (Tag-Team)</option>}
-                                            {formData.game === 'Volleyball' && <option value="Team of 6" className="bg-[#020617] text-white">6-MAN SQUAD</option>}
+                                            {formData.game === 'Volleyball' && <option value="Team of 6" className="bg-[#020617] text-white">6-MAN SQUAD (+2 SUBS)</option>}
                                         </select>
                                         <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-primary/50 text-xs">▼</div>
                                     </div>
@@ -167,7 +167,17 @@ const Register = () => {
                             <div className="grid gap-8">
                                 {formData.players.map((p, i) => (
                                     <div key={i} className="group/player relative glass-morphism p-8 rounded-[2rem] border border-white/5 hover:border-primary/20 transition-all duration-500 hover:-translate-y-1 hover:shadow-xl">
-                                        <div className="absolute top-6 right-8 text-6xl font-black italic text-white/[0.02] group-hover/player:text-primary/5 transition-colors pointer-events-none">#{i + 1}</div>
+                                        {/* Dynamic Label: Show Substitute for 7th and 8th players in Volleyball */}
+                                        <div className="absolute top-6 right-8 text-6xl font-black italic text-white/[0.02] group-hover/player:text-primary/5 transition-colors pointer-events-none">
+                                            {formData.game === 'Volleyball' && i >= 6 ? `SUB-${i - 5}` : `#${i + 1}`}
+                                        </div>
+
+                                        {/* Substitute Banner */}
+                                        {formData.game === 'Volleyball' && i >= 6 && (
+                                            <div className="absolute top-0 right-0 bg-secondary/20 text-secondary text-[10px] font-black px-4 py-1 rounded-bl-xl rounded-tr-[2rem] border-b border-l border-secondary/20">
+                                                RESERVE UNIT
+                                            </div>
+                                        )}
 
                                         <div className="grid lg:grid-cols-2 gap-8 relative z-10">
                                             <div className="space-y-1 group/field">

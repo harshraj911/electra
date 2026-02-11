@@ -1,21 +1,10 @@
 import { QRCodeCanvas } from 'qrcode.react';
 import { useRef } from 'react';
 
-const DynamicQR = ({ game, teamType, upiId = "7888778370@ybl", payeeName = "Harsh Raj" }) => {
+const DynamicQR = ({ game, teamType, upiId = "7888778370@ybl", payeeName = "Harsh Raj", amount = 0 }) => {
     const qrRef = useRef();
 
-    // Fee logic based on user's new requirements
-    const getFee = () => {
-        if (game === 'Badminton') {
-            return teamType === 'Single' ? 59 : 99;
-        }
-        if (game === 'Volleyball') {
-            return teamType === 'Single' ? 59 : 249;
-        }
-        return 0;
-    };
-
-    const amount = getFee();
+    // Amount is now passed from parent based on centralized logic in Payment.jsx
     const note = `Ground Clash - ${game} ${teamType}`;
 
     // UPI payment link format: upi://pay?pa=UPI_ID&pn=PAYEE_NAME&am=AMOUNT&cu=INR&tn=NOTE

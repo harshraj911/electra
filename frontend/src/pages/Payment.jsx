@@ -116,6 +116,7 @@ const Payment = () => {
                         upiId={upiId}
                         payeeName={payeeName}
                         qrImage={qrImage}
+                        amount={price}
                     />
 
                     {/* Right Panel: Proof Upload */}

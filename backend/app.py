@@ -23,7 +23,7 @@ if not os.path.exists(UPLOAD_FOLDER):
 
 # Define headers
 HEADERS = ['Timestamp', 'Game', 'Team Type', 'Team Name', 'Unique ID', 'Payment SS']
-for i in range(1, 7):
+for i in range(1, 9):
     HEADERS.extend([f'Player{i} Name', f'Player{i} RegNo', f'Player{i} Year', f'Player{i} WhatsApp', f'Player{i} Gender'])
 
 def init_db():
@@ -76,15 +76,22 @@ def register():
     
     # Duplicate check
     new_reg_nos = [p.get('regNo') for p in players if p.get('regNo')]
-    reg_no_indices = [HEADERS.index(f'Player{i} RegNo') + 1 for i in range(1, 7)]
-    game_col_idx = HEADERS.index('Game') + 1
+    # Update duplicate check for 8 players
+    reg_no_indices = [HEADERS.index(f'Player{i} RegNo') + 1 for i in range(1, 9) if f'Player{i} RegNo' in HEADERS]
+    # Fallback if headers in file don't match (for older files)
+    if not reg_no_indices:
+         reg_no_indices = [6 + ((i-1)*5) + 2 for i in range(1, 9)]
+
+    game_col_idx = 2 # Game is 2nd column
     
     for row in ws.iter_rows(min_row=2, values_only=True):
         if row[game_col_idx - 1] == game:
             for idx in reg_no_indices:
-                if row[idx - 1] and str(row[idx - 1]) in map(str, new_reg_nos):
-                    wb.close()
-                    return jsonify({'error': f'Registration Number {row[idx-1]} is already registered for {game}.'}), 400
+                # bounds check
+                if idx - 1 < len(row):
+                    if row[idx - 1] and str(row[idx - 1]) in map(str, new_reg_nos):
+                        wb.close()
+                        return jsonify({'error': f'Registration Number {row[idx-1]} is already registered for {game}.'}), 400
 
     # Calculate Unique ID
     unique_id = ""
@@ -105,7 +112,7 @@ def register():
         ss_url
     ]
     
-    for i in range(6):
+    for i in range(8):
         if i < len(players):
             p = players[i]
             row_data.extend([
@@ -131,9 +138,9 @@ def get_registrations():
     registrations = []
     for row in ws.iter_rows(min_row=2, values_only=True):
         players_list = []
-        for i in range(6):
-            base_idx = 6 + (i * 5) # Updated base_idx
-            if row[base_idx]:
+        for i in range(8):
+            base_idx = 6 + (i * 5)
+            if base_idx < len(row) and row[base_idx]:
                 players_list.append({
                     'name': row[base_idx], 
                     'regNo': row[base_idx+1], 
