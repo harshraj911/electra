@@ -12,8 +12,8 @@ const Payment = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isRevealed, setIsRevealed] = useState(false);
 
-    const [upiId, setUpiId] = useState('9631627055@ptaxis'); // Default fallback
-    const [payeeName, setPayeeName] = useState('Harsh Raj');
+    const [upiId, setUpiId] = useState('anshulbhuria2006-1@oksbi'); // Default fallback
+    const [payeeName, setPayeeName] = useState('Anshul Bhuria');
     const [qrImage, setQrImage] = useState('');
 
     useEffect(() => {
