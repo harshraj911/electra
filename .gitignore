@@ -16,9 +16,15 @@ __pycache__/
 env/
 venv/
 .env
+.env.local
+.env.production
+.env.development
 .venv/
 pip-log.txt
 pip-delete-this-directory.txt
+
+# ngrok
+ngrok.yml
 
 # Data & Local Settings
 backend/ground_clash_registrations.xlsx

@@ -1,0 +1,43 @@
+services:
+  # Backend Web Service
+  - type: web
+    name: ground-clash-backend
+    runtime: python
+    region: singapore
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11
+      - key: DATA_DIR
+        value: /var/data
+    disk:
+      name: electra-data
+      mountPath: /var/data
+      sizeGB: 1
+    healthCheckPath: /payment-settings
+    autoDeploy: true
+
+staticSites:
+  # Frontend Static Site
+  - name: ground-clash-frontend
+    runtime: static
+    region: singapore
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: ground-clash-backend
+          property: url
+    routes:
+      # SPA Catch-all
+      - type: rewrite
+        source: /*
+        destination: /index.html

@@ -1,7 +1,23 @@
 import axios from 'axios';
 
+// Smart API URL detection for all environments
+const getBaseURL = () => {
+    // 1. If VITE_API_URL is set (for custom configurations), use it
+    if (import.meta.env.VITE_API_URL) {
+        return import.meta.env.VITE_API_URL;
+    }
+
+    // 2. In production (deployed), use same origin (no port needed)
+    if (import.meta.env.PROD) {
+        return window.location.origin;
+    }
+
+    // 3. In development, use localhost:5001 or hostname:5001
+    return `http://${window.location.hostname}:5001`;
+};
+
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || `http://${window.location.hostname}:5001`,
+    baseURL: getBaseURL(),
 });
 
 export const register = (formData) => api.post('/register', formData, { headers: { 'Content-Type': 'multipart/form-data' } });

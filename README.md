@@ -33,7 +33,7 @@ cd backend
 pip install -r requirements.txt
 python app.py
 ```
-*Port configuration: http://127.0.0.1:5001*
+*Port configuration: http://0.0.0.0:5001*
 
 ### 2. Launch Interface (React)
 Navigate to the `frontend` directory:
@@ -42,7 +42,24 @@ cd frontend
 npm install
 npm run dev
 ```
-*Access via: http://localhost:5173*
+*Access via: http://localhost:5174*
+
+## 📱 Network Access
+
+### Local Network (Same Wi-Fi)
+Access from any device on the same network:
+- **Frontend:** `http://YOUR_IP:5174`
+- **Example:** `http://10.35.14.236:5174`
+
+### Deployment to Render
+
+This application is configured for deployment on [Render](https://render.com).
+
+1. Push the code to a GitHub repository.
+2. In the Render Dashboard, create a new **Blueprint** and connect your repository.
+3. Render will automatically detect the `render.yaml` configuration and deploy::
+   - **Backend Web Service** (Python Flask) with persistent disk storage.
+   - **Frontend Static Site** (React Vite).
 
 ## 📝 Admin Credentials
 - **Username:** `hraj48147`

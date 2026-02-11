@@ -9,9 +9,14 @@ from werkzeug.utils import secure_filename
 app = Flask(__name__)
 CORS(app)
 
-DB_FILE = 'ground_clash_registrations.xlsx'
-SETTINGS_FILE = 'settings.json'
-UPLOAD_FOLDER = 'uploads'
+# Use DATA_DIR from env if available, otherwise current directory (for local dev)
+DATA_DIR = os.environ.get('DATA_DIR', '.')
+if not os.path.exists(DATA_DIR):
+    os.makedirs(DATA_DIR)
+
+DB_FILE = os.path.join(DATA_DIR, 'ground_clash_registrations.xlsx')
+SETTINGS_FILE = os.path.join(DATA_DIR, 'settings.json')
+UPLOAD_FOLDER = os.path.join(DATA_DIR, 'uploads')
 
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
@@ -180,7 +185,7 @@ def upload_qr():
     
     with open(SETTINGS_FILE, 'r') as f:
         settings = json.load(f)
-    settings['qr_image'] = f"http://127.0.0.1:5001/uploads/{filename}"
+    settings['qr_image'] = f"{request.host_url}uploads/{filename}"
     with open(SETTINGS_FILE, 'w') as f:
         json.dump(settings, f)
         
