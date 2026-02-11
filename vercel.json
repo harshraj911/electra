@@ -15,12 +15,8 @@
     ],
     "rewrites": [
         {
-            "source": "/(api|registrations|download-excel|clear-data|payment-settings|upload-qr|uploads)/(.*)",
+            "source": "/(api|registrations|download-excel|clear-data|payment-settings|upload-qr|uploads)(/.*)?",
             "destination": "backend/app.py"
-        },
-        {
-            "source": "/index.html",
-            "destination": "/index.html"
         },
         {
             "source": "/assets/(.*)",
