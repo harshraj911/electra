@@ -32,6 +32,14 @@ const DynamicQR = ({ game, teamType, upiId = "7888778370@ybl", payeeName = "Hars
                         size={window.innerWidth < 640 ? 200 : 250}
                         level="H"
                         includeMargin={true}
+                        imageSettings={{
+                            src: "/logo.png",
+                            x: undefined,
+                            y: undefined,
+                            height: window.innerWidth < 640 ? 45 : 60,
+                            width: window.innerWidth < 640 ? 45 : 60,
+                            excavate: true,
+                        }}
                     />
 
                     {/* Scanner animation overlay */}
