@@ -105,7 +105,12 @@ const AdminDashboard = () => {
         try {
             const res = await uploadQR(formData);
             setQrPreview(res.data.url);
-        } catch (err) { alert("Upload failed."); }
+            alert("QR Asset Uploaded & Updated.");
+        } catch (err) {
+            const errorMsg = err.response?.data?.error || "Connection failure.";
+            const hint = err.response?.data?.hint || "";
+            alert(`Upload Failed: ${errorMsg}${hint ? '\n\n' + hint : ''}`);
+        }
     };
 
     return (

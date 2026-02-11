@@ -20,7 +20,16 @@ CREATE POLICY "Enable read access for all users" ON public.settings FOR SELECT U
 CREATE POLICY "Enable update access for all users" ON public.settings FOR UPDATE USING (true);
 CREATE POLICY "Enable insert access for all users" ON public.settings FOR INSERT WITH CHECK (true);
 
--- STORAGE SETUP INSTRUCTIONS (You need to do this in Supabase Dashboard -> Storage)
--- 1. Create a new bucket named 'images'
+-- STORAGE SETUP INSTRUCTIONS (Run these in Supabase SQL Editor OR Dashboard)
+-- 1. Manually create a bucket named 'images' in Dashboard -> Storage
 -- 2. Make it 'Public'
--- 3. Add policy to allow upload/select for public (or authenticated if you prefer)
+-- 3. Run the following to allow anyone to upload (for registrations/QR):
+
+-- Allow public uploads to 'images' bucket
+CREATE POLICY "Allow Public Uploads" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'images');
+
+-- Allow public read access to 'images' bucket
+CREATE POLICY "Allow Public Select" ON storage.objects FOR SELECT USING (bucket_id = 'images');
+
+-- Allow updates (for admins replacing QR)
+CREATE POLICY "Allow Public Update" ON storage.objects FOR UPDATE USING (bucket_id = 'images');

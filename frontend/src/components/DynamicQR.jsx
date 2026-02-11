@@ -1,7 +1,7 @@
 import { QRCodeCanvas } from 'qrcode.react';
 import { useRef } from 'react';
 
-const DynamicQR = ({ game, teamType, upiId = "7888778370@ybl", payeeName = "Harsh Raj", amount = 0 }) => {
+const DynamicQR = ({ game, teamType, upiId = "7888778370@ybl", payeeName = "Harsh Raj", amount = 0, qrImage = "" }) => {
     const qrRef = useRef();
 
     // Amount is now passed from parent based on centralized logic in Payment.jsx
@@ -11,12 +11,23 @@ const DynamicQR = ({ game, teamType, upiId = "7888778370@ybl", payeeName = "Hars
     const upiLink = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(payeeName)}&am=${amount}.00&cu=INR&tn=${encodeURIComponent(note)}&mode=02&purpose=00`;
 
     const downloadQR = () => {
-        const canvas = qrRef.current.querySelector('canvas');
-        if (canvas) {
+        const canvas = qrRef.current.querySelector('canvas') || qrRef.current.querySelector('img');
+        if (!canvas) return;
+
+        if (canvas.tagName === 'CANVAS') {
             const url = canvas.toDataURL("image/png");
             const link = document.createElement('a');
             link.href = url;
             link.download = `Electra_QR_${game}_${teamType}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } else {
+            // It's an image
+            const link = document.createElement('a');
+            link.href = canvas.src;
+            link.download = `Electra_QR_${game}_${teamType}.png`;
+            link.target = "_blank";
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -27,23 +38,36 @@ const DynamicQR = ({ game, teamType, upiId = "7888778370@ybl", payeeName = "Hars
         <div className="flex flex-col items-center gap-4 sm:gap-6 p-6 sm:p-8 glass-morphism rounded-[2rem] sm:rounded-[2.5rem] border border-white/10 animate-fade-in-up">
             <div className="relative group p-3 sm:p-4 bg-white rounded-2xl sm:rounded-3xl shadow-2xl hover:scale-105 transition-all duration-500" id="qr-container" ref={qrRef}>
                 <a href={upiLink} className="block relative">
-                    <QRCodeCanvas
-                        value={upiLink}
-                        size={window.innerWidth < 640 ? 200 : 250}
-                        level="H"
-                        includeMargin={true}
-                        imageSettings={{
-                            src: "/logo.png",
-                            x: undefined,
-                            y: undefined,
-                            height: window.innerWidth < 640 ? 45 : 60,
-                            width: window.innerWidth < 640 ? 45 : 60,
-                            excavate: true,
-                        }}
-                    />
-
-                    {/* Scanner animation overlay */}
-                    <div className="absolute inset-x-0 h-1 bg-primary/60 animate-scanner top-0 left-0 shadow-[0_0_15px_rgba(6,182,212,0.8)] pointer-events-none"></div>
+                    {qrImage ? (
+                        <div className="relative">
+                            <img
+                                src={qrImage}
+                                alt="Payment QR"
+                                className="w-[200px] h-[200px] sm:w-[250px] sm:h-[250px] object-contain"
+                            />
+                            {/* Scanner animation overlay */}
+                            <div className="absolute inset-x-0 h-1 bg-primary/60 animate-scanner top-0 left-0 shadow-[0_0_15px_rgba(6,182,212,0.8)] pointer-events-none"></div>
+                        </div>
+                    ) : (
+                        <>
+                            <QRCodeCanvas
+                                value={upiLink}
+                                size={window.innerWidth < 640 ? 200 : 250}
+                                level="H"
+                                includeMargin={true}
+                                imageSettings={{
+                                    src: "/logo.png",
+                                    x: undefined,
+                                    y: undefined,
+                                    height: window.innerWidth < 640 ? 45 : 60,
+                                    width: window.innerWidth < 640 ? 45 : 60,
+                                    excavate: true,
+                                }}
+                            />
+                            {/* Scanner animation overlay */}
+                            <div className="absolute inset-x-0 h-1 bg-primary/60 animate-scanner top-0 left-0 shadow-[0_0_15px_rgba(6,182,212,0.8)] pointer-events-none"></div>
+                        </>
+                    )}
                 </a>
             </div>
 

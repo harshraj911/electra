@@ -37,11 +37,28 @@ def register():
             if file.filename != '':
                 filename = secure_filename(f"payment_{datetime.now().timestamp()}.png")
                 try:
-                    res = supabase.storage.from_(SUPABASE_BUCKET).upload(filename, file.read(), file_options={"content-type": file.mimetype})
-                    ss_url = supabase.storage.from_(SUPABASE_BUCKET).get_public_url(filename)
+                    file_content = file.read()
+                    if file_content:
+                        content_type = file.mimetype or "image/png"
+                        res = supabase.storage.from_(SUPABASE_BUCKET).upload(
+                            filename, 
+                            file_content, 
+                            file_options={"content-type": content_type}
+                        )
+                        
+                        # Check for error in response
+                        if hasattr(res, 'error') and res.error:
+                             raise Exception(f"Supabase Storage Error: {res.error}")
+                             
+                        ss_url = supabase.storage.from_(SUPABASE_BUCKET).get_public_url(filename)
                 except Exception as e:
-                    print(f"Storage Upload Error: {e}")
-                    # Fallback or allow continue without screenshot? Allow.
+                    print(f"CRITICAL: Storage Upload Error: {e}")
+                    # If screenshot was provided but failed to upload, we should probably inform the user
+                    return jsonify({
+                        'error': 'Payment Proof Upload Failed', 
+                        'details': str(e),
+                        'hint': "Check if 'images' bucket exists and is public in Supabase."
+                    }), 500
 
         # Calculate Unique ID
         unique_id = ""
@@ -162,28 +179,56 @@ def update_settings():
 @app.route('/upload-qr', methods=['POST'])
 def upload_qr():
     if 'file' not in request.files:
-        return jsonify({'error': 'No file part'}), 400
+        return jsonify({'error': 'No file part in request'}), 400
     file = request.files['file']
     if file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
     
     try:
+        # Check if file has content
+        file_content = file.read()
+        if not file_content:
+            return jsonify({'error': 'File is empty'}), 400
+            
         filename = secure_filename(f"qr_{datetime.now().timestamp()}.png")
-        res = supabase.storage.from_(SUPABASE_BUCKET).upload(filename, file.read(), file_options={"content-type": file.mimetype})
-        public_url = supabase.storage.from_(SUPABASE_BUCKET).get_public_url(filename)
         
-        # Update settings with new QR
-        existing = supabase.table('settings').select("id").limit(1).execute()
-        if existing.data:
-            sid = existing.data[0]['id']
-            supabase.table('settings').update({'qr_image': public_url}).eq('id', sid).execute()
-        else:
-            supabase.table('settings').insert({'qr_image': public_url, 'upi_id': ''}).execute()
+        # Attempt upload to Supabase
+        try:
+            # We use file.mimetype but default to image/png if not present
+            content_type = file.mimetype or "image/png"
+            
+            res = supabase.storage.from_(SUPABASE_BUCKET).upload(
+                filename, 
+                file_content, 
+                file_options={"content-type": content_type}
+            )
+            
+            # Check for error in response (some versions of supabase-py return error in response)
+            if hasattr(res, 'error') and res.error:
+                 raise Exception(f"Supabase Storage Error: {res.error}")
+                 
+            public_url = supabase.storage.from_(SUPABASE_BUCKET).get_public_url(filename)
+            
+            # Update settings with new QR
+            existing = supabase.table('settings').select("id").limit(1).execute()
+            if existing.data:
+                sid = existing.data[0]['id']
+                supabase.table('settings').update({'qr_image': public_url}).eq('id', sid).execute()
+            else:
+                supabase.table('settings').insert({'qr_image': public_url, 'upi_id': ''}).execute()
 
-        return jsonify({'url': public_url})
+            return jsonify({'url': public_url, 'message': 'Storage upload successful'})
+            
+        except Exception as storage_err:
+            print(f"DEBUG: Supabase Storage Exception: {storage_err}")
+            return jsonify({
+                'error': f"Storage Upload Failed: {str(storage_err)}",
+                'hint': "Ensure the 'images' bucket exists in Supabase and is set to 'Public' with 'INSERT' policies for 'anon' role."
+            }), 500
+            
     except Exception as e:
-        print(f"QR Upload Error: {e}")
-        return jsonify({'error': str(e)}), 500
+        print(f"QR Upload General Error: {e}")
+        return jsonify({'error': f"Internal Server Error: {str(e)}"}), 500
 
 @app.route('/download-excel', methods=['GET'])
 def download_excel():
