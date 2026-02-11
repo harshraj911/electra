@@ -37,7 +37,7 @@ const Payment = () => {
             return regData.teamType === 'Single' ? 59 : 99;
         }
         if (regData.game === 'Volleyball') {
-            return regData.teamType === 'Single' ? 59 : 249;
+            return regData.teamType === 'Single' ? 79 : 499;
         }
         return 0;
     };
