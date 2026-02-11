@@ -16,8 +16,11 @@ const getBaseURL = () => {
     return `http://${window.location.hostname}:5001`;
 };
 
+const baseURL = getBaseURL();
+console.log("🔌 Connected to Backend:", baseURL);
+
 const api = axios.create({
-    baseURL: getBaseURL(),
+    baseURL: baseURL,
 });
 
 export const register = (formData) => api.post('/register', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
