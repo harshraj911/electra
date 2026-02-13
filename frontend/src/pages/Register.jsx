@@ -50,6 +50,14 @@ const Register = () => {
         if (formData.teamType !== 'Single' && !formData.teamName.trim()) newErrors.teamName = 'Required';
 
         formData.players.forEach((p, i) => {
+            // Check if this player is a substitute (Volleyball 7th and 8th player)
+            const isOptional = formData.game === 'Volleyball' && i >= 6;
+
+            // If it's a substitute and completely empty, skip validation
+            if (isOptional && !p.name.trim() && !p.regNo.trim() && !p.year && !p.gender && !p.whatsapp) {
+                return;
+            }
+
             if (!p.name.trim()) newErrors[`p${i}n`] = true;
             if (!p.regNo.trim()) newErrors[`p${i}r`] = true;
             if (!p.year) newErrors[`p${i}y`] = true;
@@ -64,7 +72,7 @@ const Register = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (!validate()) {
-            alert('Please check all input fields. All player data is mandatory.');
+            alert('Please check all required fields. Note: Substitute players are optional.');
             return;
         }
         navigate('/payment', { state: { regData: formData } });
@@ -169,13 +177,13 @@ const Register = () => {
                                     <div key={i} className="group/player relative glass-morphism p-8 rounded-[2rem] border border-white/5 hover:border-primary/20 transition-all duration-500 hover:-translate-y-1 hover:shadow-xl">
                                         {/* Dynamic Label: Show Substitute for 7th and 8th players in Volleyball */}
                                         <div className="absolute top-6 right-8 text-6xl font-black italic text-white/[0.02] group-hover/player:text-primary/5 transition-colors pointer-events-none">
-                                            {formData.game === 'Volleyball' && i >= 6 ? `SUB-${i - 5}` : `#${i + 1}`}
+                                            {formData.game === 'Volleyball' && i >= 6 ? `SUB-${i - 5} (OPTIONAL)` : `#${i + 1}`}
                                         </div>
 
                                         {/* Substitute Banner */}
                                         {formData.game === 'Volleyball' && i >= 6 && (
                                             <div className="absolute top-0 right-0 bg-secondary/20 text-secondary text-[10px] font-black px-4 py-1 rounded-bl-xl rounded-tr-[2rem] border-b border-l border-secondary/20">
-                                                RESERVE UNIT
+                                                OPTIONAL RESERVE UNIT
                                             </div>
                                         )}
 
