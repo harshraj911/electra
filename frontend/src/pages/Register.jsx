@@ -82,8 +82,8 @@ const Register = () => {
         <div className="min-h-screen bg-[#020617] text-white py-10 px-6 relative overflow-hidden selection:bg-primary selection:text-black font-sans">
 
             {/* Ambient Background Elements */}
-            <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/10 blur-[200px] -z-10 animate-morph opacity-40"></div>
-            <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-secondary/10 blur-[180px] -z-10 animate-morph opacity-30" style={{ animationDelay: '-5s' }}></div>
+            <div className="absolute top-0 right-0 w-[300px] h-[300px] sm:w-[800px] sm:h-[800px] bg-primary/10 blur-[100px] sm:blur-[200px] -z-10 animate-morph opacity-40" style={{ willChange: 'transform, opacity' }}></div>
+            <div className="absolute bottom-0 left-0 w-[250px] h-[250px] sm:w-[600px] sm:h-[600px] bg-secondary/10 blur-[90px] sm:blur-[180px] -z-10 animate-morph opacity-30" style={{ animationDelay: '-5s', willChange: 'transform, opacity' }}></div>
 
             <div className={`max-w-5xl mx-auto relative z-10 transition-all duration-1000 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
 

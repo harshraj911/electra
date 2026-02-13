@@ -10,7 +10,7 @@ const SupportButton = () => {
             href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="fixed bottom-6 right-6 z-[9999] group flex items-center gap-3"
+            className="fixed bottom-28 right-4 sm:bottom-6 sm:right-6 z-[9999] group flex items-center gap-3"
         >
             <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full group-hover:bg-primary/40 transition-all duration-500 animate-pulse"></div>
 

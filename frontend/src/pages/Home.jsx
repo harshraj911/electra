@@ -97,8 +97,8 @@ const Home = () => {
                 ))}
 
                 {/* Subtle Moving Orbs */}
-                <div className="absolute top-[20%] left-[10%] w-[400px] md:w-[600px] h-[400px] md:h-[600px] bg-cyan-500/10 blur-[100px] md:blur-[150px] animate-pulse"></div>
-                <div className="absolute bottom-[20%] right-[10%] w-[400px] md:w-[600px] h-[400px] md:h-[600px] bg-lime-500/10 blur-[100px] md:blur-[150px] animate-pulse" style={{ animationDelay: '-3s' }}></div>
+                <div className="absolute top-[20%] left-[10%] w-[250px] sm:w-[600px] h-[250px] sm:h-[600px] bg-cyan-500/10 blur-[80px] sm:blur-[150px] animate-pulse" style={{ willChange: 'transform' }}></div>
+                <div className="absolute bottom-[20%] right-[10%] w-[250px] sm:w-[600px] h-[250px] sm:h-[600px] bg-lime-500/10 blur-[80px] sm:blur-[150px] animate-pulse" style={{ animationDelay: '-3s', willChange: 'transform' }}></div>
 
                 {/* Vertical Speed Lines */}
                 <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[length:100%_80px]"></div>
@@ -209,7 +209,7 @@ const Home = () => {
                         <div className="relative group">
                             <div
                                 ref={containerRef}
-                                className={`h-28 bg-white/[0.02] border border-white/10 rounded-full p-3 relative flex items-center transition-all duration-1000 overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)] ${isSwiped ? 'scale-110 opacity-0 blur-3xl' : 'hover:border-primary/30 group-hover:shadow-[0_0_60px_rgba(6,182,212,0.1)]'}`}
+                                className={`h-28 bg-white/[0.02] border border-white/10 rounded-full p-3 relative flex items-center transition-all duration-1000 overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.5)] touch-none ${isSwiped ? 'scale-110 opacity-0 blur-3xl' : 'hover:border-primary/30 group-hover:shadow-[0_0_60px_rgba(6,182,212,0.1)]'}`}
                             >
                                 <div className="absolute inset-0 flex items-center justify-center">
                                     <p className="text-[14px] font-black uppercase tracking-[0.8em] text-white/10 italic group-hover:text-primary/30 group-hover:tracking-[1em] transition-all duration-700">
@@ -230,10 +230,10 @@ const Home = () => {
                                     ref={sliderRef}
                                     onMouseDown={handleStart}
                                     onTouchStart={handleStart}
-                                    style={{ transform: `translateX(${sliderPos}px)` }}
+                                    style={{ transform: `translateX(${sliderPos}px)`, willChange: 'transform' }}
                                     className="w-22 h-22 bg-white rounded-full shadow-[0_0_40px_rgba(255,255,255,0.8)] flex items-center justify-center cursor-grab active:cursor-grabbing z-20 transition-transform active:scale-95 group-hover:scale-105"
                                 >
-                                    <span className="text-black text-4xl font-black italic group-hover:translate-x-1 transition-transform">→</span>
+                                    <span className="text-black text-4xl font-black italic group-hover:translate-x-1 transition-transform pointer-events-none">→</span>
                                 </div>
                             </div>
                             {/* Decorative Outer Ring */}
