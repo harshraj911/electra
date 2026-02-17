@@ -246,7 +246,7 @@ const Home = () => {
                 <footer className="flex flex-col md:flex-row justify-between items-center md:items-end gap-10 animate-fade-in-up mt-20 text-center md:text-left" style={{ animationDelay: '0.8s' }}>
                     <div className="flex flex-col sm:flex-row items-center gap-8 sm:gap-10 group cursor-default">
                         <div className="md:text-right md:border-r-2 border-white/10 md:pr-10 group-hover:border-primary transition-colors duration-500">
-                            <p className="font-heading text-3xl italic leading-none group-hover:text-primary transition-colors">FEB 20-21</p>
+                            <p className="font-heading text-3xl italic leading-none group-hover:text-primary transition-colors">FEB 27-28</p>
                             <p className="text-[10px] font-black uppercase tracking-[0.5em] text-white/30 group-hover:text-white transition-colors mt-2">Arena Entry</p>
                         </div>
                         <div className="text-center sm:text-left">

@@ -1,7 +1,7 @@
 import React from 'react';
 
 const SupportButton = () => {
-    const phoneNumber = "7888778370";
+    const phoneNumber = "7488985861";
     const message = encodeURIComponent("Hello! I need support regarding Ground Clash registration.");
     const whatsappUrl = `https://wa.me/91${phoneNumber}?text=${message}`;
 
