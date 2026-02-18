@@ -10,10 +10,10 @@ const Payment = () => {
     const [logoError, setLogoError] = useState(false);
     const [screenshot, setScreenshot] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [upiId, setUpiId] = useState('9113401017@slc'); // Default fallback
+    const [upiId, setUpiId] = useState('kingshukbhowmick1@oksbi'); // Default fallback
     const [isRevealed, setIsRevealed] = useState(false);
 
-    const [payeeName, setPayeeName] = useState('Harsh Raj');
+    const [payeeName, setPayeeName] = useState('Kingshuk Bhowmick');
 
     useEffect(() => {
         if (!location.state?.regData) {

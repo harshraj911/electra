@@ -26,7 +26,7 @@ const DynamicQR = ({ game, teamType, upiId = "7888778370@ybl", payeeName = "Hars
     return (
         <div className="flex flex-col items-center gap-4 sm:gap-6 p-6 sm:p-8 glass-morphism rounded-[2rem] sm:rounded-[2.5rem] border border-white/10 animate-fade-in-up">
             <div className="relative group p-3 sm:p-4 bg-white rounded-2xl sm:rounded-3xl shadow-2xl hover:scale-105 transition-all duration-500" id="qr-container" ref={qrRef}>
-                <a href={upiLink} className="block relative">
+                <div className="relative block">
                     <QRCodeCanvas
                         value={upiLink}
                         size={window.innerWidth < 640 ? 200 : 250}
@@ -44,7 +44,7 @@ const DynamicQR = ({ game, teamType, upiId = "7888778370@ybl", payeeName = "Hars
 
                     {/* Scanner animation overlay */}
                     <div className="absolute inset-x-0 h-1 bg-primary/60 animate-scanner top-0 left-0 shadow-[0_0_15px_rgba(6,182,212,0.8)] pointer-events-none"></div>
-                </a>
+                </div>
             </div>
 
             <div className="text-center space-y-2 sm:space-y-3 w-full">
@@ -66,12 +66,6 @@ const DynamicQR = ({ game, teamType, upiId = "7888778370@ybl", payeeName = "Hars
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full mt-2">
-                <a
-                    href={upiLink}
-                    className="flex-1 py-4 bg-primary text-black text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] rounded-xl sm:rounded-2xl flex items-center justify-center gap-2 hover:bg-white transition-all active:scale-95 shadow-[0_4px_15px_rgba(6,182,212,0.4)]"
-                >
-                    <span className="text-base">⚡</span> INSTANT PAY
-                </a>
                 <button
                     onClick={downloadQR}
                     className="flex-1 py-4 glass-morphism border-primary/30 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-primary hover:bg-primary/10 transition-all rounded-xl sm:rounded-2xl active:scale-95 flex items-center justify-center gap-2"
