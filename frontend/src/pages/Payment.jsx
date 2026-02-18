@@ -102,6 +102,11 @@ const Payment = () => {
                     <div className="space-y-3 sm:space-y-4">
                         <p className="text-[10px] sm:text-[12px] font-black uppercase tracking-[0.5em] sm:tracking-[0.8em] text-cyan-400 mb-1 sm:mb-2 italic">Phase 02: Settlement</p>
                         <h2 className="font-accent text-4xl sm:text-5xl md:text-6xl italic tracking-tighter uppercase mb-4 sm:mb-6 leading-none">SECURE <span className="text-primary text-glow-cyan">VAULT</span></h2>
+                        <div className="flex justify-center">
+                            <p className="text-[9px] sm:text-[11px] font-black uppercase tracking-[0.2em] sm:tracking-[0.4em] text-lime-400 bg-lime-400/10 py-2.5 px-6 rounded-full border border-lime-400/20 animate-pulse shadow-[0_0_15px_rgba(163,230,53,0.1)]">
+                                Pay on this QR and upload the screenshot
+                            </p>
+                        </div>
                     </div>
                 </div>
 
