@@ -10,7 +10,7 @@ const Payment = () => {
     const [logoError, setLogoError] = useState(false);
     const [screenshot, setScreenshot] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [upiId, setUpiId] = useState('hraj48147@oksbi'); // Default fallback
+    const [upiId, setUpiId] = useState('9113401017@slc'); // Default fallback
     const [isRevealed, setIsRevealed] = useState(false);
 
     const [payeeName, setPayeeName] = useState('Harsh Raj');
